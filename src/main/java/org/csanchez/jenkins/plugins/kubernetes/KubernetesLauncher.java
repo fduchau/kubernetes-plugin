@@ -102,6 +102,12 @@ public class KubernetesLauncher extends JNLPLauncher {
             String namespace = StringUtils.defaultIfBlank(slave.getNamespace(), client.getNamespace());
 
             LOGGER.log(Level.FINE, "Creating Pod: {0} in namespace {1}", new Object[]{podId, namespace});
+            if (client.pods().inNamespace(namespace).withName(podId).get() != null) {
+                LOGGER.log(INFO, "Pod {0} in namespace {1} is already created. Skipping", new Object[]{podId, namespace});
+                logger.printf("Pod %s in namespace %s is already created. Skipping%n", podId, namespace);
+
+                return;
+            }
             pod = client.pods().inNamespace(namespace).create(pod);
             LOGGER.log(INFO, "Created Pod: {0} in namespace {1}", new Object[]{podId, namespace});
             logger.printf("Created Pod: %s in namespace %s%n", podId, namespace);
